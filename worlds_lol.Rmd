@@ -1,0 +1,122 @@
+---
+title: "lol_data"
+output: html_document
+date: "2022-11-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library (stringr)
+library(tidyverse)
+```
+
+## R Markdown
+
+```{r}
+lol_data <-  read.csv("C:/Users/bethe/OneDrive/Documents/2022_lol.csv")
+```
+
+```{r}
+#data specifically looking at worlds
+worlds <- lol_data %>% 
+  filter(league =='WCS') %>%
+  filter(patch == '12.18')
+
+#just looking at team data
+worlds_team <- worlds %>%
+  filter(position == 'team')
+
+#drx at worlds
+drx <- worlds %>%
+  filter(teamname == 'DRX') %>%
+  filter(position == 'team') 
+
+#t1 at worlds
+t1 <-  worlds %>% 
+  filter(teamname == 'T1') %>%
+  filter(position == 'team') 
+```
+
+```{r}
+# shows all the teams and the number of games they played 
+num_games <- worlds %>%
+  filter(position == 'team') %>%
+  group_by(teamname) %>%
+  count %>%
+  arrange(desc(n))
+
+#all of guma's picks at worlds
+guma_picks <- worlds %>%
+  filter(teamname == 'T1') %>%
+  filter(position == 'bot') %>%
+  select(champion)
+
+#Q: When was caitlyn not banned against T1?
+
+#get all of t1's game id
+t1_id <- t1 %>% 
+  select(gameid)
+
+t1_enemies <- worlds_team %>% 
+  filter(str_detect(worlds_team$gameid, paste(t1_id$gameid,collapse = '|'))) %>%
+  filter(teamname != 'T1') 
+
+#A: Cait was not banned against EDG in the group stage
+t1cait_banned <- t1_enemies %>%
+  filter(ban1 != 'Caitlyn')%>%
+  filter(ban2 != 'Caitlyn') %>%
+  filter(ban3 != 'Caitlyn') %>%
+  filter(ban4 != 'Caitlyn') %>%
+  filter(ban5 != 'Caitlyn') %>% 
+  select(gameid) 
+
+#t1 stats for t1 vs edg round robin 2
+t1vsedg <- worlds%>% 
+  filter(teamname == "EDward Gaming") %>%
+  filter(position != "team") %>%
+  filter(gameid == paste(t1cait_banned)) %>%
+  select(ban1,ban2,ban3,ban4,ban5)
+
+#times t1 banned cait
+t1_cait  <- t1 %>%
+  filter(ban1 == 'Caitlyn' | ban2 == 'Caitlyn' | ban3 == 'Caityn' | ban4 == 'Caitlyn' | ban5 == 'Caityn') 
+
+red_t1 <-  t1 %>%
+  filter(side == 'Red')
+```
+
+```{r}
+drx_id <- worlds_team %>%
+  filter(teamname == 'DRX') %>% 
+  select(gameid)
+
+drxban <- worlds_team %>% 
+  filter(str_detect(worlds_team$gameid,paste(drx_id$gameid,collapse = '|'))) %>%
+  filter(teamname != 'DRX') %>%
+  filter(side == 'Red')
+  
+
+
+bot_geng <- worlds %>%
+  filter(teamname == 'Gen.G') %>%
+  filter(position == 'bot') %>%
+  select(gameid,champion)
+
+sup_geng <- worlds %>%
+  filter(teamname == 'Gen.G') %>%
+  filter(position == 'sup') %>%
+  select(gameid, champion)
+
+botlane_geng <- merge(bot_geng,sup_geng, by = 'gameid')
+```
+
+Problems with this dataset:
+
+1.  Doesn't show what champs were banned and what order.
+2.  Because bans are consolidated as ban1,ban2,ban3 and etc. it's a lot harder to find things like total bans.
+
+What can I do to fix this. I can make a new data frame that has all bans, with that it is a lot easier to find how much a character was banned in a series.
+
+I can add the characters banned against them through looking at the game id and trying to crosspost it with that but the other problem is the fact
