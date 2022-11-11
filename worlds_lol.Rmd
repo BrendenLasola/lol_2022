@@ -26,7 +26,6 @@ worlds <- lol_data %>%
   filter(patch == '12.18')
 ```
 
-
 ```{r}
 #Q: Create a dataset that has worlds_team, who they picked and who they banned.
 #Notes:  1. Maybe remove the side from the actual columns
@@ -91,7 +90,6 @@ blue_team <- blue_list %>%
 blue_team$blue <- NULL
 ```
 
-
 ```{r}
 
 #All games on red side      
@@ -153,7 +151,6 @@ red_team <- red_list %>%
 red_team$red <- NULL
 ```
 
-
 ```{r}
 #Merging blue team and red team by gameid
 worlds_team <- merge(blue_team,red_team,by="gameid")
@@ -169,7 +166,7 @@ bans <- worlds %>%
   filter(position == 'team') %>%
   select(ban1,ban2,ban3,ban4,ban5) 
 
-#wide to long conversion
+#wide to long conversion of bans 
 bans <- pivot_longer(bans, cols=1:5, names_to = 'ban', values_to = 'banned')
 
 #only banned
@@ -180,124 +177,8 @@ num_banned <- bans %>%
   group_by(banned) %>%
   count %>%
   arrange(desc(n))
-  
-```
-
-
-```{r}
-df <- data.frame(
-list(
-heading1=c(12, 99),
-heading2=c(34, 42),
-value=c(1,0)))
-
-
-rbind(df %>% select(heading1, value),
-      df %>% select(heading2, value) %>% rename(heading1 = heading2))
-
-```
-
-```{r}
-t1vsedg <- worlds%>% 
-  filter(teamname == "EDward Gaming") %>%
-  filter(position != "team") %>%
-  filter(gameid == paste(t1cait_banned)) %>%
-  select(ban1,ban2,ban3,ban4,ban5)
-
-```
-
-Checklist:
-1. Which side? Can I add blue side or red side
-2. Can I see when each ban actually happened? Is that possible to do
-3. Can I add when each pick actually happened. 
-
-TESTING:
-```{r}
-
-```
-
-Make functions for these?
-```{r}
-#drx at worlds
-drx <- worlds %>%
-  filter(teamname == 'DRX') %>%
-  filter(position == 'team') 
-
-#t1 at worlds
-t1 <-  worlds %>% 
-  filter(teamname == 'T1') %>%
-  filter(position == 'team') 
-
-guma_picks <- worlds %>%
-  filter(teamname == 'T1') %>%
-  filter(position == 'bot') %>%
-  select(champion)
 ```
 
 
 
-```{r}
-# shows all the teams and the number of games they played 
-num_games <- worlds_team %>%
-  group_by(teamname) %>%
-  count %>%
-  arrange(desc(n))
 
-
-
-#Q: When was caitlyn not banned against T1?
-
-#get all of t1's game id
-t1_id <- t1 %>% 
-  select(gameid)
-
-t1_enemies <- worlds_team %>% 
-  filter(str_detect(worlds_team$gameid, paste(t1_id$gameid,collapse = '|'))) %>%
-  filter(teamname != 'T1') 
-
-#A: Cait was not banned against EDG in the group stage
-t1cait_banned <- t1_enemies %>%
-  filter(ban1 != 'Caitlyn')%>%
-  filter(ban2 != 'Caitlyn') %>%
-  filter(ban3 != 'Caitlyn') %>%
-  filter(ban4 != 'Caitlyn') %>%
-  filter(ban5 != 'Caitlyn') %>% 
-  select(gameid) 
-
-#t1 stats for t1 vs edg round robin 2
-t1vsedg <- worlds%>% 
-  filter(teamname == "EDward Gaming") %>%
-  filter(position != "team") %>%
-  filter(gameid == paste(t1cait_banned)) %>%
-  select(ban1,ban2,ban3,ban4,ban5)
-
-#times t1 banned cait
-t1_cait  <- t1 %>%
-  filter(ban1 == 'Caitlyn' | ban2 == 'Caitlyn' | ban3 == 'Caityn' | ban4 == 'Caitlyn' | ban5 == 'Caityn') 
-
-red_t1 <-  t1 %>%
-  filter(side == 'Red')
-```
-
-```{r}
-drx_id <- worlds_team %>%
-  filter(teamname == 'DRX') %>% 
-  select(gameid)
-
-drxban <- worlds_team %>% 
-  filter(str_detect(worlds_team$gameid,paste(drx_id$gameid,collapse = '|'))) %>%
-  filter(teamname != 'DRX') %>%
-  filter(side == 'Red')
-
-bot_geng <- worlds %>%
-  filter(teamname == 'Gen.G') %>%
-  filter(position == 'bot') %>%
-  select(gameid,champion)
-
-sup_geng <- worlds %>%
-  filter(teamname == 'Gen.G') %>%
-  filter(position == 'sup') %>%
-  select(gameid, champion)
-
-botlane_geng <- merge(bot_geng,sup_geng, by = 'gameid')
-```
