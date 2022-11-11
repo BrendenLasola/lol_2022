@@ -15,19 +15,209 @@ library(tidyverse)
 ## R Markdown
 
 ```{r}
-lol_data <-  read.csv("C:/Users/bethe/OneDrive/Documents/2022_lol.csv")
+lol_data <-  read.csv("C:/Users/Brenden/Documents/Data/2022_lol.csv") 
+
 ```
 
 ```{r}
-#data specifically looking at worlds
+#data specifically looking at worlds 2022
 worlds <- lol_data %>% 
   filter(league =='WCS') %>%
   filter(patch == '12.18')
+```
 
-#just looking at team data
-worlds_team <- worlds %>%
-  filter(position == 'team')
 
+```{r}
+#Q: Create a dataset that has worlds_team, who they picked and who they banned.
+#Notes:  1. Maybe remove the side from the actual columns
+#        2. How do I get the champion picks on tho this dataset
+
+#All the games on blue side
+blue_side <- worlds %>%
+  filter(position == 'team') %>%
+  filter(side == 'Blue') %>%
+  select(gameid,teamname,side,ban1,ban2,ban3,ban4,ban5) %>%
+  rename(blue_team = teamname,
+         blue = side,
+         b1 = ban1,
+         b2 = ban2,
+         b3 = ban3,
+         b4 = ban4, 
+         b5 = ban5)
+
+#blue side top 
+blue_top <- worlds %>%
+  filter(position == 'top') %>%
+  filter(side == 'Blue') %>%
+  select(gameid,champion) %>%
+  rename(blue_top = champion)
+
+#blue side jung
+blue_jng <- worlds %>%
+  filter(position == 'jng') %>%
+  filter(side == 'Blue') %>%
+  select(gameid,champion) %>%
+  rename(blue_jng = champion)
+
+#blue side mid
+blue_mid <- worlds %>%
+  filter(position == 'mid') %>%
+  filter(side == 'Blue') %>%
+  select(gameid,champion) %>%
+  rename(blue_mid = champion)
+
+#blue side bot
+blue_bot <- worlds %>% 
+  filter(position == 'bot') %>%
+  filter(side == 'Blue') %>%
+  select(gameid, champion) %>%
+  rename(blue_bot = champion)
+
+#blue side sup
+blue_sup <- worlds %>%
+  filter(position == 'sup') %>%
+  filter(side == 'Blue') %>%
+  select(gameid,champion) %>%
+  rename(blue_sup = champion)
+
+#list of all roles for blue side with team
+blue_list <- list(blue_side,blue_top,blue_jng,blue_mid,blue_bot,blue_sup)
+
+#blue team, merging all picks and bans
+blue_team <- blue_list %>%
+  reduce(full_join, by ='gameid')
+
+#deleting blue column because it isn't needed anymore. 
+blue_team$blue <- NULL
+```
+
+
+```{r}
+
+#All games on red side      
+red_side <- worlds %>%
+  filter(position == 'team') %>%
+  filter(side == 'Red') %>%
+  select(gameid,teamname,side,ban1,ban2,ban3,ban4,ban5) %>%
+  rename(red_team = teamname,
+         red = side,
+         r1 = ban1,
+         r2 = ban2,
+         r3 = ban3,
+         r4 = ban4, 
+         r5 = ban5)
+
+#red side top 
+red_top <- worlds %>%
+  filter(position == 'top') %>%
+  filter(side == 'Red') %>%
+  select(gameid,champion) %>%
+  rename(red_top = champion)
+
+#red side jung
+red_jng <- worlds %>%
+  filter(position == 'jng') %>%
+  filter(side == 'Red') %>%
+  select(gameid,champion) %>%
+  rename(red_jng = champion)
+
+#redside mid
+red_mid <- worlds %>%
+  filter(position == 'mid') %>%
+  filter(side == 'Red') %>%
+  select(gameid,champion) %>%
+  rename(red_mid = champion)
+
+#blue side bot
+red_bot <- worlds %>% 
+  filter(position == 'bot') %>%
+  filter(side == 'Red') %>%
+  select(gameid, champion) %>%
+  rename(red_bot = champion)
+
+#red side sup
+red_sup <- worlds %>%
+  filter(position == 'sup') %>%
+  filter(side == 'Red') %>%
+  select(gameid,champion) %>%
+  rename(red_sup = champion)
+
+#list of all roles for red side with team
+red_list <- list(red_side,red_top,red_jng,red_mid,red_bot,red_sup)
+
+#blue team, merging all picks and bans
+red_team <- red_list %>%
+  reduce(full_join, by ='gameid')
+
+#deleting red column because it isn't needed anymore. 
+red_team$red <- NULL
+```
+
+
+```{r}
+#Merging blue team and red team by gameid
+worlds_team <- merge(blue_team,red_team,by="gameid")
+
+#Champion picks and count 
+num_picked <- worlds %>%
+  group_by(champion) %>%
+  count %>%
+  arrange(desc(n))
+
+#combining all the bans together
+bans <- worlds %>%
+  filter(position == 'team') %>%
+  select(ban1,ban2,ban3,ban4,ban5) 
+
+#wide to long conversion
+bans <- pivot_longer(bans, cols=1:5, names_to = 'ban', values_to = 'banned')
+
+#only banned
+bans <- bans %>% select(banned)
+
+#champions banned and count
+num_banned <- bans %>%
+  group_by(banned) %>%
+  count %>%
+  arrange(desc(n))
+  
+```
+
+
+```{r}
+df <- data.frame(
+list(
+heading1=c(12, 99),
+heading2=c(34, 42),
+value=c(1,0)))
+
+
+rbind(df %>% select(heading1, value),
+      df %>% select(heading2, value) %>% rename(heading1 = heading2))
+
+```
+
+```{r}
+t1vsedg <- worlds%>% 
+  filter(teamname == "EDward Gaming") %>%
+  filter(position != "team") %>%
+  filter(gameid == paste(t1cait_banned)) %>%
+  select(ban1,ban2,ban3,ban4,ban5)
+
+```
+
+Checklist:
+1. Which side? Can I add blue side or red side
+2. Can I see when each ban actually happened? Is that possible to do
+3. Can I add when each pick actually happened. 
+
+TESTING:
+```{r}
+
+```
+
+Make functions for these?
+```{r}
 #drx at worlds
 drx <- worlds %>%
   filter(teamname == 'DRX') %>%
@@ -37,21 +227,23 @@ drx <- worlds %>%
 t1 <-  worlds %>% 
   filter(teamname == 'T1') %>%
   filter(position == 'team') 
-```
 
-```{r}
-# shows all the teams and the number of games they played 
-num_games <- worlds %>%
-  filter(position == 'team') %>%
-  group_by(teamname) %>%
-  count %>%
-  arrange(desc(n))
-
-#all of guma's picks at worlds
 guma_picks <- worlds %>%
   filter(teamname == 'T1') %>%
   filter(position == 'bot') %>%
   select(champion)
+```
+
+
+
+```{r}
+# shows all the teams and the number of games they played 
+num_games <- worlds_team %>%
+  group_by(teamname) %>%
+  count %>%
+  arrange(desc(n))
+
+
 
 #Q: When was caitlyn not banned against T1?
 
@@ -96,8 +288,6 @@ drxban <- worlds_team %>%
   filter(str_detect(worlds_team$gameid,paste(drx_id$gameid,collapse = '|'))) %>%
   filter(teamname != 'DRX') %>%
   filter(side == 'Red')
-  
-
 
 bot_geng <- worlds %>%
   filter(teamname == 'Gen.G') %>%
@@ -111,12 +301,3 @@ sup_geng <- worlds %>%
 
 botlane_geng <- merge(bot_geng,sup_geng, by = 'gameid')
 ```
-
-Problems with this dataset:
-
-1.  Doesn't show what champs were banned and what order.
-2.  Because bans are consolidated as ban1,ban2,ban3 and etc. it's a lot harder to find things like total bans.
-
-What can I do to fix this. I can make a new data frame that has all bans, with that it is a lot easier to find how much a character was banned in a series.
-
-I can add the characters banned against them through looking at the game id and trying to crosspost it with that but the other problem is the fact
