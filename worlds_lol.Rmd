@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library (stringr)
 library(tidyverse)
+library(ggplot2)
 ```
 
 ## R Markdown
@@ -179,6 +180,11 @@ num_banned <- bans %>%
   arrange(desc(n))
 ```
 
+For num_banned and num_picked,I want to make a bar graph that has the champion PNG + the amount of stuff that is going there. 
+```{r}
+red <-ggplot(data=num_banned, aes(x=banned, y=n)) +
+  geom_bar(stat="identity")
+```
 
 
 
