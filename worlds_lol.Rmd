@@ -7,6 +7,7 @@ date: "2022-11-01"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+#libraries
 library(dplyr)
 library(stringr)
 library(tidyverse)
@@ -23,6 +24,7 @@ lol_data <-  read.csv("C:/Users/bethe/OneDrive/Documents/Data/2022_lol.csv")
 
 ```{r}
 #data specifically looking at worlds 2022
+#patch at 12.18 because data was included to WCS that was not apart of the tournament
 worlds <- lol_data %>% 
   filter(league =='WCS') %>%
   filter(patch == '12.18')
@@ -242,39 +244,65 @@ top <- worlds %>%
   group_by(playername,champion) %>%
   summarise(total_count=n(),.groups = 'drop') %>%
   arrange(desc(total_count))
+```
 
+
+```{r}
 #Function that shows what each player was playing and how many times they played that champion
 num_bot <- function(name) {
   num_played <- adc %>%
     filter(playername == name)
-  return(num_played)
+  
+  bot_graph <- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
+  geom_bar(stat="identity", color='skyblue',fill='steelblue') + xlab('Champion') + ylab('# Picked')
+  
+  return(bot_graph)
 }
+
 num_mid <- function(name) {
   num_played <- mid %>%
     filter(playername == name)
-  return(num_played)
+  
+  mid_graph <- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
+  geom_bar(stat="identity", color='skyblue',fill='steelblue') + xlab('Champion') + ylab('# Picked')
+  
+  return(mid_graph)
 }
+
 num_sup <- function(name) {
   num_played <- sup %>%
     filter(playername == name)
-  return(num_played)
+  
+  sup_graph <- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
+  geom_bar(stat="identity", color='skyblue',fill='steelblue') + xlab('Champion') + ylab('# Picked')
+  
+  return(sup_graph)
 }
+
 num_jung <- function(name) {
   num_played <- jung %>%
     filter(playername == name)
-  return(num_played)
+  
+  jung_graph <- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
+  geom_bar(stat="identity", color='skyblue',fill='steelblue') + xlab('Champion') + ylab('# Picked')
+  
+  return(jung_graph)
 }
+
 num_top <- function(name) {
   num_played <- top %>%
     filter(playername == name)
-  return(num_played)
+  
+  top_graph <- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
+  geom_bar(stat="identity", color='skyblue',fill='steelblue') + xlab('Champion') + ylab('# Picked')
+  
+  return(top_graph)
 }
 
 #Playernames
 bot_laners <- unique(adc$playername)
-support <- unique(sup$playername)
+support    <- unique(sup$playername)
 top_laners <- unique(top$playername)
 mid_laners <- unique(mid$playername)
-jungle <- unique(jung$playername)
-
+jungle     <- unique(jung$playername)
 ```
