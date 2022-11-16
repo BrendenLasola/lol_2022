@@ -1,4 +1,3 @@
-
 library(dplyr)
 library(stringr)
 library(tidyverse)
@@ -6,8 +5,8 @@ library(ggplot2)
 library(ggimage)
 
 
-#lol_data <-  read.csv("C:/Users/Brenden/Documents/Data/2022_lol.csv") 
-lol_data <-  read.csv("C:/Users/bethe/OneDrive/Documents/Data/2022_lol.csv")
+lol_data <-  read.csv("C:/Users/Brenden/Documents/Data/2022_lol.csv") 
+#lol_data <-  read.csv("C:/Users/bethe/OneDrive/Documents/Data/2022_lol.csv")
 
 
 
