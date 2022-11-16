@@ -563,58 +563,7 @@ top &lt;- worlds %&gt;%
   group_by(playername,champion) %&gt;%
   summarise(total_count=n(),.groups = &#39;drop&#39;) %&gt;%
   arrange(desc(total_count))</code></pre>
-<pre class="r"><code>#Function that shows what each player was playing and how many times they played that champion
-num_bot &lt;- function(name) {
-  num_played &lt;- adc %&gt;%
-    filter(playername == name)
-  
-  bot_graph &lt;- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
-  geom_bar(stat=&quot;identity&quot;, color=&#39;skyblue&#39;,fill=&#39;steelblue&#39;) + xlab(&#39;Champion&#39;) + ylab(&#39;# Picked&#39;)
-  
-  return(bot_graph)
-}
-
-num_mid &lt;- function(name) {
-  num_played &lt;- mid %&gt;%
-    filter(playername == name)
-  
-  mid_graph &lt;- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
-  geom_bar(stat=&quot;identity&quot;, color=&#39;skyblue&#39;,fill=&#39;steelblue&#39;) + xlab(&#39;Champion&#39;) + ylab(&#39;# Picked&#39;)
-  
-  return(mid_graph)
-}
-
-num_sup &lt;- function(name) {
-  num_played &lt;- sup %&gt;%
-    filter(playername == name)
-  
-  sup_graph &lt;- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
-  geom_bar(stat=&quot;identity&quot;, color=&#39;skyblue&#39;,fill=&#39;steelblue&#39;) + xlab(&#39;Champion&#39;) + ylab(&#39;# Picked&#39;)
-  
-  return(sup_graph)
-}
-
-num_jung &lt;- function(name) {
-  num_played &lt;- jung %&gt;%
-    filter(playername == name)
-  
-  jung_graph &lt;- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
-  geom_bar(stat=&quot;identity&quot;, color=&#39;skyblue&#39;,fill=&#39;steelblue&#39;) + xlab(&#39;Champion&#39;) + ylab(&#39;# Picked&#39;)
-  
-  return(jung_graph)
-}
-
-num_top &lt;- function(name) {
-  num_played &lt;- top %&gt;%
-    filter(playername == name)
-  
-  top_graph &lt;- ggplot(num_played, aes(x = reorder(champion, -total_count), y = total_count)) +
-  geom_bar(stat=&quot;identity&quot;, color=&#39;skyblue&#39;,fill=&#39;steelblue&#39;) + xlab(&#39;Champion&#39;) + ylab(&#39;# Picked&#39;)
-  
-  return(top_graph)
-}
-
-#Playernames
+<pre class="r"><code>#Playernames
 bot_laners &lt;- unique(adc$playername)
 support    &lt;- unique(sup$playername)
 top_laners &lt;- unique(top$playername)

@@ -3,6 +3,7 @@ library(tidyverse)
 library(ggplot2)
 library(shiny)
 library(shinythemes)
+library(ggthemes)
 
 #Loading Dataset
 lol_data <-  read.csv("Data/2022_lol.csv") 
@@ -261,4 +262,8 @@ support   <- unique(sup$playername)
 top_laners <- unique(top$playername)
 mid_laners <- unique(mid$playername)
 jungle     <- unique(jung$playername)
+
+#Split the dataset into: Play-In's, Group Stages, Knockout Stage, Quarter Final, Semi Final, Final 
+
+
 
