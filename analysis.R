@@ -1,34 +1,21 @@
----
-title: "lol_data"
-output: html_document
-date: "2022-11-01"
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 
 library(dplyr)
 library(stringr)
 library(tidyverse)
 library(ggplot2)
 library(ggimage)
-```
 
-## R Markdown
 
-```{r}
 #lol_data <-  read.csv("C:/Users/Brenden/Documents/Data/2022_lol.csv") 
 lol_data <-  read.csv("C:/Users/bethe/OneDrive/Documents/Data/2022_lol.csv")
-```
 
-```{r}
+
+
 #data specifically looking at worlds 2022
 worlds <- lol_data %>% 
   filter(league =='WCS') %>%
   filter(patch == '12.18')
-```
 
-```{r}
 #Q: Create a dataset that has worlds_team, who they picked and who they banned.
 #Notes:  1. Maybe remove the side from the actual columns
 #        2. How do I get the champion picks on tho this dataset
@@ -90,9 +77,6 @@ blue_team <- blue_list %>%
 
 #deleting blue column because it isn't needed anymore. 
 blue_team$blue <- NULL
-```
-
-```{r}
 
 #All games on red side      
 red_side <- worlds %>%
@@ -151,9 +135,7 @@ red_team <- red_list %>%
 
 #deleting red column because it isn't needed anymore. 
 red_team$red <- NULL
-```
 
-```{r}
 #Merging blue team and red team by gameid
 worlds_team <- merge(blue_team,red_team,by="gameid")
 
@@ -181,9 +163,7 @@ num_banned <- bans %>%
   group_by(banned) %>%
   count %>%
   arrange(desc(n))
-```
 
-```{r}
 #top 10 banned
 top_10bans <- head(num_banned,10)
 top_10bangraph <- ggplot(top_10bans, aes(x = reorder(banned, -n), y = n)) +
@@ -200,9 +180,7 @@ games_played <- worlds %>%
   group_by(teamname) %>% 
   count %>%
   arrange(desc(n))
-```
 
-```{r}
 #adc and champs
 adc <- worlds %>%
   filter(position == 'bot') %>%
@@ -238,6 +216,7 @@ jung <- worlds %>%
 #top laners and champs
 top <- worlds %>%
   filter(position == 'top') %>%
+  filter(playername == "Kingen") %>%
   select(playername,champion) %>%
   group_by(playername,champion) %>%
   summarise(total_count=n(),.groups = 'drop') %>%
@@ -277,4 +256,3 @@ top_laners <- unique(top$playername)
 mid_laners <- unique(mid$playername)
 jungle <- unique(jung$playername)
 
-```
