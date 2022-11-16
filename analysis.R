@@ -1,14 +1,11 @@
 library(dplyr)
-library(stringr)
 library(tidyverse)
 library(ggplot2)
-library(ggimage)
+library(shiny)
+library(shinythemes)
 
-
-lol_data <-  read.csv("C:/Users/Brenden/Documents/Data/2022_lol.csv") 
-#lol_data <-  read.csv("C:/Users/bethe/OneDrive/Documents/Data/2022_lol.csv")
-
-
+#Loading Dataset
+lol_data <-  read.csv("Data/2022_lol.csv") 
 
 #data specifically looking at worlds 2022
 worlds <- lol_data %>% 
@@ -166,13 +163,24 @@ num_banned <- bans %>%
 #top 10 banned
 top_10bans <- head(num_banned,10)
 top_10bangraph <- ggplot(top_10bans, aes(x = reorder(banned, -n), y = n)) +
-  geom_bar(stat="identity", color='skyblue',fill='steelblue') + xlab('Champion') + ylab('# Banned')
+  geom_bar(stat="identity", color='black',fill='gray') + 
+  xlab('Champion') + 
+  ylab('# Banned') +
+  labs(title = "Most Banned at Worlds 2022",
+       subtitle = "How many times was each Champion banned at Worlds 2022") +
+  theme_fivethirtyeight() 
 
 #top 10 picked
 top_10picked <- head(num_picked,10)
 top_10pickgraph <- ggplot(top_10picked, aes(x = reorder(champion, -n), y = n)) +
-  geom_bar(stat="identity", color='skyblue',fill='steelblue') + xlab('Champion') + ylab('# Picked')
-
+  geom_bar(stat="identity", color='black',fill='gray') + 
+  xlab('Champion') + 
+  ylab('# Banned') +
+  labs(title = "Most Picked at Worlds 2022",
+       subtitle = "How many times was each Champion picked at Worlds 2022") +
+  theme_fivethirtyeight() 
+                     
+                     
 #games played for each team}
 games_played <- worlds %>%
   filter(position == 'team') %>%
@@ -215,7 +223,6 @@ jung <- worlds %>%
 #top laners and champs
 top <- worlds %>%
   filter(position == 'top') %>%
-  filter(playername == "Kingen") %>%
   select(playername,champion) %>%
   group_by(playername,champion) %>%
   summarise(total_count=n(),.groups = 'drop') %>%
@@ -250,8 +257,8 @@ num_top <- function(name) {
 
 #Playernames
 bot_laners <- unique(adc$playername)
-support <- unique(sup$playername)
+support   <- unique(sup$playername)
 top_laners <- unique(top$playername)
 mid_laners <- unique(mid$playername)
-jungle <- unique(jung$playername)
+jungle     <- unique(jung$playername)
 
