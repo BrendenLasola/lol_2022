@@ -275,6 +275,39 @@ champions <- unique(worlds$champion)
 #num unique champs at worlds 2022
 unique_champs <- length(champions)
 
+#midlane champs 
+mid_champs <- worlds %>%
+  filter(position == "mid") %>%
+  select(playername,champion)
+
+#list of mid_champs
+mid_champs <- unique(mid_champs$champion)
+num_midchamps <- length(mid_champs)
+
+
+champs <- function(role,region) {
+  champions <- region%>%
+    filter(position == role) %>%
+    select(playername,champion) 
+  num_champs <- length(unique(champions$champion))
+  return(num_champs)
+}
+
+#LCS playoffs
+LCS <- lol_data %>% 
+  filter(league =='LCS') %>%
+  filter(patch == "12.15") 
+
+
+
+champs('sup', LCS)
+
+num_LCS <- LCS %>%
+  filter(side =="Blue") %>%
+  filter(position == "team") 
+
+#what roles were this champions played at? 
+
 #Split the dataset into: Play-In's, Group Stages, Knockout Stage, Quarter Final, Semi Final, Final 
 
 
