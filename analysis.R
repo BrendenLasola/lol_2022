@@ -6,7 +6,7 @@ library(shinythemes)
 library(ggthemes)
 
 #Loading Dataset
-lol_data <-  read.csv("Data/2022_lol.csv") 
+lol_data <-  read.csv("2022_lol.csv") 
 
 #data specifically looking at worlds 2022
 worlds <- lol_data %>% 
@@ -256,12 +256,24 @@ num_top <- function(name) {
   return(num_played)
 }
 
+num_champ <- function(champ) {
+  pick_champ <- num_picked %>% 
+    filter(champion == champ)
+  return(pick_champ)
+}
+
 #Playernames
 bot_laners <- unique(adc$playername)
 support   <- unique(sup$playername)
 top_laners <- unique(top$playername)
 mid_laners <- unique(mid$playername)
 jungle     <- unique(jung$playername)
+
+#champions
+champions <- unique(worlds$champion)
+
+#num unique champs at worlds 2022
+unique_champs <- length(champions)
 
 #Split the dataset into: Play-In's, Group Stages, Knockout Stage, Quarter Final, Semi Final, Final 
 

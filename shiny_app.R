@@ -1,35 +1,4 @@
-source("GitHub/lol_2022/analysis.R")
-
-ban_page <- tabPanel(
-  "MOST BANNED",
-  sidebarPanel(
-        p("Througout Worlds 2022, there were three champions that had significantly more bans than other teams. 
-          What this means is that most teams in the tournament consider these three champions as problem characters.
-          Yuumi has a 100% win rate, Caitlyn had 62.5% win rate, and Aatrox had a 54.5% win rate (Win rate was not provided
-          in this data set, data was collected from gol.gg). Yuumi and Caitlyn were picked 8 times while Aatrox was picked 22 times. This data shows that even though Aatrox 
-          was deemed as a strong Champion more teams were willing to let him go compared to Caitlyn and Yuumi."), 
-          
-          p("Bans in League of Legends is interesting because after the first 3, the other bans are spread out. In specific patches or 
-          versions of the game, some characters are deemed to be too strong. This is what decides the overall metagame of league
-          of legends. The rest of the banning phase are more spread out because teams are banning specific champions against specific teams.
-          "),
-  ),
-    ### Main panel displays the bar graph
-    mainPanel(
-      plotOutput(outputId = "most_banned")
-    )
-  )
-
-pick_page <- tabPanel(
-  "MOST PICKED",
-  sidebarPanel(
-       p ("Compared to bans, the champion diversity in picks are a lot more spreadout. The way that pick and bans work in league of Legends is")
-  ),
-  ### Main panel displays the bar graph
-  mainPanel(
-    plotOutput(outputId = "most_picked"),
-  )
-)
+source("analysis.R")
 
 top_page <- tabPanel(
   "TOP",
@@ -119,14 +88,6 @@ jun_page <- tabPanel(
 
 #creating the plot
 server <- function(input,output) {
-  
-  output$most_banned<- renderPlot({
-    top_10bangraph
-  })
-  
-  output$most_picked<- renderPlot({
-    top_10pickgraph
-  })
   
   output$top_data <- renderPlot({
     
@@ -245,7 +206,7 @@ server <- function(input,output) {
 
 ui <- fluidPage(theme = shinytheme('cosmo'),
   navbarPage("WORLDS 2022 CHAMPION DIVERSITY",
-  ban_page,pick_page,top_page,jun_page,mid_page,bot_page,sup_page))
+  top_page,jun_page,mid_page,bot_page,sup_page))
 
 # Run the application 
 shinyApp(  ui, server = server)
