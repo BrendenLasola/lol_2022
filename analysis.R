@@ -8,14 +8,12 @@ library(ggthemes)
 #Loading Dataset
 lol_data <-  read.csv("2022_lol.csv") 
 
-#data specifically looking at worlds 2022
+#Worlds 2022 Data
 worlds <- lol_data %>% 
   filter(league =='WCS') %>%
   filter(patch == '12.18')
 
-#Q: Create a dataset that has worlds_team, who they picked and who they banned.
-#Notes:  1. Maybe remove the side from the actual columns
-#        2. How do I get the champion picks on tho this dataset
+
 
 #All the games on blue side
 blue_side <- worlds %>%
@@ -29,7 +27,6 @@ blue_side <- worlds %>%
          b3 = ban3,
          b4 = ban4, 
          b5 = ban5)
-
 #blue side top 
 blue_top <- worlds %>%
   filter(position == 'top') %>%
@@ -136,13 +133,10 @@ red_team$red <- NULL
 #Merging blue team and red team by gameid
 worlds_team <- merge(blue_team,red_team,by="gameid")
 
-#Champion picks and count 
-num_picked <- worlds %>%
-  group_by(champion) %>%
-  count %>%
-  arrange(desc(n)) %>%
-  na_if("") %>%
-  na.omit
+
+
+
+
 
 #combining all the bans together
 bans <- worlds %>%
@@ -171,6 +165,14 @@ top_10bangraph <- ggplot(top_10bans, aes(x = reorder(banned, -n), y = n)) +
        subtitle = "How many times was each Champion banned at Worlds 2022") +
   theme_fivethirtyeight() 
 
+#Champion picks and count 
+num_picked <- worlds %>%
+  group_by(champion) %>%
+  count %>%
+  arrange(desc(n)) %>%
+  na_if("") %>%
+  na.omit
+
 #top 10 picked
 top_10picked <- head(num_picked,10)
 top_10pickgraph <- ggplot(top_10picked, aes(x = reorder(champion, -n), y = n)) +
@@ -181,7 +183,10 @@ top_10pickgraph <- ggplot(top_10picked, aes(x = reorder(champion, -n), y = n)) +
        subtitle = "How many times was each Champion picked at Worlds 2022") +
   theme_fivethirtyeight() 
                      
-                     
+ 
+
+
+                    
 #games played for each team}
 games_played <- worlds %>%
   filter(position == 'team') %>%
@@ -189,78 +194,10 @@ games_played <- worlds %>%
   count %>%
   arrange(desc(n))
 
-#adc and champs
-adc <- worlds %>%
-  filter(position == 'bot') %>%
-  select(playername,champion) %>%
-  group_by(playername,champion) %>%
-  summarise(total_count=n(),.groups = 'drop') %>%
-  arrange(desc(total_count))
 
-#support and champs
-sup <- worlds %>%
-  filter(position == 'sup') %>%
-  select(playername,champion) %>%
-  group_by(playername,champion) %>%
-  summarise(total_count=n(),.groups = 'drop') %>%
-  arrange(desc(total_count))
 
-#mid laners and champs
-mid <- worlds %>%
-  filter(position == 'mid') %>%
-  select(playername,champion) %>%
-  group_by(playername,champion) %>%
-  summarise(total_count=n(),.groups = 'drop') %>%
-  arrange(desc(total_count))
 
-#jung and champs
-jung <- worlds %>%
-  filter(position == 'jng') %>%
-  select(playername,champion) %>%
-  group_by(playername,champion) %>%
-  summarise(total_count=n(),.groups = 'drop') %>%
-  arrange(desc(total_count))
 
-#top laners and champs
-top <- worlds %>%
-  filter(position == 'top') %>%
-  select(playername,champion) %>%
-  group_by(playername,champion) %>%
-  summarise(total_count=n(),.groups = 'drop') %>%
-  arrange(desc(total_count))
-
-#Function that shows what each player was playing and how many times they played that champion
-num_bot <- function(name) {
-  num_played <- adc %>%
-    filter(playername == name)
-  return(num_played)
-}
-num_mid <- function(name) {
-  num_played <- mid %>%
-    filter(playername == name)
-  return(num_played)
-}
-num_sup <- function(name) {
-  num_played <- sup %>%
-    filter(playername == name)
-  return(num_played)
-}
-num_jung <- function(name) {
-  num_played <- jung %>%
-    filter(playername == name)
-  return(num_played)
-}
-num_top <- function(name) {
-  num_played <- top %>%
-    filter(playername == name)
-  return(num_played)
-}
-
-num_champ <- function(champ) {
-  pick_champ <- num_picked %>% 
-    filter(champion == champ)
-  return(pick_champ)
-}
 
 #Playernames
 bot_laners <- unique(adc$playername)
@@ -275,40 +212,63 @@ champions <- unique(worlds$champion)
 #num unique champs at worlds 2022
 unique_champs <- length(champions)
 
-#midlane champs 
+#champs in role
 mid_champs <- worlds %>%
   filter(position == "mid") %>%
   select(playername,champion)
+jng_champs <- worlds %>%
+  filter(position == "jng") %>%
+  select(playername,champion)
+top_champs <- worlds %>%
+  filter(position == "top") %>%
+  select(playername,champion)
+bot_champs <- worlds %>%
+  filter(position == "bot") %>%
+  select(playername,champion)
+sup_champs <- worlds %>%
+  filter(position == "sup") %>%
+  select(playername,champion,position)
 
-#list of mid_champs
+#unique champs
 mid_champs <- unique(mid_champs$champion)
-num_midchamps <- length(mid_champs)
+jng_champs <- unique(jng_champs$champion)
+top_champs <- unique(top_champs$champion)
+bot_champs <- unique(bot_champs$champion) 
+sup_champs <- unique(sup_champs$champion) 
 
 
-champs <- function(role,region) {
-  champions <- region%>%
-    filter(position == role) %>%
-    select(playername,champion) 
-  num_champs <- length(unique(champions$champion))
-  return(num_champs)
-}
+df <-  worlds %>%
+  filter(position != 'team') %>%
+  group_by(position) %>% 
+  summarise(n=n_distinct(champion)) 
 
-#LCS playoffs
-LCS <- lol_data %>% 
-  filter(league =='LCS') %>%
-  filter(patch == "12.15") 
-
+df2 <- worlds %>%
+  filter(position != 'team') %>%
+  group_by(champion) %>%
+  summarise(n=n_distinct(position)) %>%
+  filter(n > 1) %>%
+  arrange(desc(n)) 
 
 
-champs('sup', LCS)
+df3 <- worlds %>%
+  filter(position != 'team') %>%
+  group_by(teamname) %>%
+  summarise(n=n_distinct(champion)) %>%
+  filter(n > 1) %>%
+  arrange(desc(n)) 
+  
 
-num_LCS <- LCS %>%
-  filter(side =="Blue") %>%
-  filter(position == "team") 
+df4 <- worlds %>%
+  filter(position != 'team') %>%
+  group_by(playername) %>%
+  summarise(n=n_distinct(champion)) %>%
+  filter(n > 1) %>%
+  arrange(desc(n)) 
 
-#what roles were this champions played at? 
 
-#Split the dataset into: Play-In's, Group Stages, Knockout Stage, Quarter Final, Semi Final, Final 
+
+
+
 
 
 
