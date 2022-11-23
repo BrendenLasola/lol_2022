@@ -13,8 +13,6 @@ worlds <- lol_data %>%
   filter(league =='WCS') %>%
   filter(patch == '12.18')
 
-
-
 #All the games on blue side
 blue_side <- worlds %>%
   filter(position == 'team') %>%
@@ -133,11 +131,6 @@ red_team$red <- NULL
 #Merging blue team and red team by gameid
 worlds_team <- merge(blue_team,red_team,by="gameid")
 
-
-
-
-
-
 #combining all the bans together
 bans <- worlds %>%
   filter(position == 'team') %>%
@@ -172,8 +165,8 @@ num_picked <- worlds %>%
   arrange(desc(n)) %>%
   na_if("") %>%
   na.omit
-
-#top 10 picked
+ 
+#top 10 picked + graph
 top_10picked <- head(num_picked,10)
 top_10pickgraph <- ggplot(top_10picked, aes(x = reorder(champion, -n), y = n)) +
   geom_bar(stat="identity", color='black',fill='gray') + 
@@ -183,10 +176,6 @@ top_10pickgraph <- ggplot(top_10picked, aes(x = reorder(champion, -n), y = n)) +
        subtitle = "How many times was each Champion picked at Worlds 2022") +
   theme_fivethirtyeight() 
                      
- 
-
-
-                    
 #games played for each team}
 games_played <- worlds %>%
   filter(position == 'team') %>%
@@ -194,17 +183,27 @@ games_played <- worlds %>%
   count %>%
   arrange(desc(n))
 
-
-
-
-
-
-#Playernames
-bot_laners <- unique(adc$playername)
-support   <- unique(sup$playername)
-top_laners <- unique(top$playername)
-mid_laners <- unique(mid$playername)
-jungle     <- unique(jung$playername)
+#list of unique players for each role
+top <-worlds %>%
+  filter(position == 'top') %>%
+  select(playername)
+top_laners <- unique(top)
+jng <-worlds %>%
+  filter(position == 'jng') %>%
+  select(playername)
+jungle<- unique(jng)
+mid <-worlds %>%
+  filter(position == 'mid') %>%
+  select(playername)
+mid_laners <- unique(mid ) 
+adc <- worlds %>%
+  filter(position == 'bot') %>%
+  select(playername)
+bot_laners <- unique(adc)
+sup <- worlds %>%
+  filter(position == 'sup') %>%
+  select(playername)
+supports <- unique(sup)
 
 #champions
 champions <- unique(worlds$champion)
@@ -236,39 +235,98 @@ top_champs <- unique(top_champs$champion)
 bot_champs <- unique(bot_champs$champion) 
 sup_champs <- unique(sup_champs$champion) 
 
-
-df <-  worlds %>%
+#Number of unique champs per role
+unique_champs <-  worlds %>%
   filter(position != 'team') %>%
   group_by(position) %>% 
   summarise(n=n_distinct(champion)) 
+#Graphg of unique_champs
+uchamps_graph <- ggplot(unique_champs,aes(y = reorder(position, n), x = n)) +
+  geom_bar(stat="identity", color='black',fill='gray') + 
+  xlab('Unique Champs') + 
+  ylab('Role') +
+  labs(title = "Unique Champs picked per Role",
+       subtitle = "Which role had the most champion diversity") +
+  theme_fivethirtyeight() 
 
-df2 <- worlds %>%
+#champs that were played in one or two more roles
+more_champs <- worlds %>%
   filter(position != 'team') %>%
   group_by(champion) %>%
   summarise(n=n_distinct(position)) %>%
   filter(n > 1) %>%
   arrange(desc(n)) 
+#graph of more_champs
+mchamps_graph <- ggplot(more_champs,aes(y = reorder(champion, n), x = n)) +
+  geom_bar(stat="identity", color='black',fill='gray') + 
+  xlab('Unique Champs') + 
+  ylab('Role') +
+  labs(title = "Champions picked for Multiple Roles (More than 1)") +
+  theme_fivethirtyeight() 
 
-
-df3 <- worlds %>%
+#teams with highest champion diversity
+distinct_teams <- worlds %>%
   filter(position != 'team') %>%
   group_by(teamname) %>%
-  summarise(n=n_distinct(champion)) %>%
-  filter(n > 1) %>%
-  arrange(desc(n)) 
-  
+  summarise(unique_champs=n_distinct(champion)) %>%
+  arrange(desc(unique_champs)) 
+#graph of distinct_teams
+team_graph <- ggplot(distinct_teams,aes(y = reorder(teamname, unique_champs), x = unique_champs)) +
+  geom_bar(stat="identity", color='black',fill='gray') + 
+  xlab('Teams') + 
+  ylab('Unique Champs') +
+  labs(title = "Unique Champs picked per Team",
+       subtitle = "Which team had the most unique champs?") +
+  theme_fivethirtyeight()
 
-df4 <- worlds %>%
+#players with the highest champion diversity 
+distinct_players <- worlds %>%
   filter(position != 'team') %>%
   group_by(playername) %>%
-  summarise(n=n_distinct(champion)) %>%
-  filter(n > 1) %>%
-  arrange(desc(n)) 
+  summarise(unique_champs=n_distinct(champion)) %>%
+  arrange(desc(unique_champs))
+distinct_players <- head(distinct_players,50)
+#graph of distinct_players
+player_graph <- ggplot(distinct_players,aes(y = reorder(playername, unique_champs), x = unique_champs)) +
+  geom_bar(stat="identity", color='black',fill='gray') + 
+  xlab('Unique Champs') + 
+  ylab('Player Name') +
+  labs(title = "Top 50 Unique Champs per Player",
+       subtitle = "Who has the most unique champs?") +
+  theme_fivethirtyeight() 
+player_graph
 
+#num games each player played
+num_playergames <- worlds %>%
+  filter(position != 'team') %>%
+  group_by(playername) %>%
+  summarise(num_games=n_distinct(gameid)) %>%
+  arrange(desc(num_games)) 
+ 
+#num games each team played
+num_teamgames <- worlds %>%
+  filter(position == 'team') %>%
+  group_by(teamname) %>%
+  summarise(num_games=n_distinct(gameid)) %>%
+  arrange(desc(num_games))
 
+uchamps_team <- merge(distinct_teams,num_teamgames,by="teamname")
 
+champion_scatter <- ggplot(uchamps_team ,aes(x = num_games, y = unique_champs)) +
+  geom_point(size = 2, color='black',fill='gray') + 
+  xlab('Unique Champs') + 
+  ylab('Role') +
+  labs(title = "Unique champions over games played per team",
+       subtitle = "Does more games = more champs played") +
+  theme_fivethirtyeight() 
 
+uchamps_players <- merge(distinct_players,num_playergames, by="playername")
 
-
-
+player_scatter <- ggplot(uchamps_players ,aes(x = num_games, y = unique_champs)) +
+  geom_point(size = 2, color='black',fill='gray') + 
+  xlab('Unique Champs') + 
+  ylab('Role') +
+  labs(title = "Unique champions over games played per player",
+       subtitle = "Does more games = more champs played") +
+  theme_fivethirtyeight() 
 
