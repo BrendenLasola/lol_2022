@@ -155,8 +155,7 @@ top_10bangraph <- ggplot(top_10bans, aes(x = reorder(banned, -n), y = n)) +
   xlab('Champion') + 
   ylab('# Banned') +
   labs(title = "Most Banned at Worlds 2022",
-       subtitle = "How many times was each Champion banned at Worlds 2022") +
-  theme_fivethirtyeight() 
+       subtitle = "How many times was each Champion banned at Worlds 2022") 
 
 #Champion picks and count 
 num_picked <- worlds %>%
@@ -173,8 +172,7 @@ top_10pickgraph <- ggplot(top_10picked, aes(x = reorder(champion, -n), y = n)) +
   xlab('Champion') + 
   ylab('# Banned') +
   labs(title = "Most Picked at Worlds 2022",
-       subtitle = "How many times was each Champion picked at Worlds 2022") +
-  theme_fivethirtyeight() 
+       subtitle = "How many times was each Champion picked at Worlds 2022")
                      
 #games played for each team}
 games_played <- worlds %>%
@@ -246,8 +244,7 @@ uchamps_graph <- ggplot(unique_champs,aes(y = reorder(position, n), x = n)) +
   xlab('Unique Champs') + 
   ylab('Role') +
   labs(title = "Unique Champs picked per Role",
-       subtitle = "Which role had the most champion diversity") +
-  theme_fivethirtyeight() 
+       subtitle = "Which role had the most champion diversity") 
 
 #champs that were played in one or two more roles
 more_champs <- worlds %>%
@@ -261,8 +258,7 @@ mchamps_graph <- ggplot(more_champs,aes(y = reorder(champion, n), x = n)) +
   geom_bar(stat="identity", color='black',fill='gray') + 
   xlab('Unique Champs') + 
   ylab('Role') +
-  labs(title = "Champions picked for Multiple Roles (More than 1)") +
-  theme_fivethirtyeight() 
+  labs(title = "Champions picked for Multiple Roles (More than 1)") 
 
 #teams with highest champion diversity
 distinct_teams <- worlds %>%
@@ -276,8 +272,7 @@ team_graph <- ggplot(distinct_teams,aes(y = reorder(teamname, unique_champs), x 
   xlab('Teams') + 
   ylab('Unique Champs') +
   labs(title = "Unique Champs picked per Team",
-       subtitle = "Which team had the most unique champs?") +
-  theme_fivethirtyeight()
+       subtitle = "Which team had the most unique champs?") 
 
 #players with the highest champion diversity 
 distinct_players <- worlds %>%
@@ -292,9 +287,7 @@ player_graph <- ggplot(distinct_players,aes(y = reorder(playername, unique_champ
   xlab('Unique Champs') + 
   ylab('Player Name') +
   labs(title = "Top 50 Unique Champs per Player",
-       subtitle = "Who has the most unique champs?") +
-  theme_fivethirtyeight() 
-player_graph
+       subtitle = "Who has the most unique champs?") 
 
 #num games each player played
 num_playergames <- worlds %>%
@@ -317,8 +310,7 @@ champion_scatter <- ggplot(uchamps_team ,aes(x = num_games, y = unique_champs)) 
   xlab('Unique Champs') + 
   ylab('Role') +
   labs(title = "Unique champions over games played per team",
-       subtitle = "Does more games = more champs played") +
-  theme_fivethirtyeight() 
+       subtitle = "Does more games = more champs played") 
 
 uchamps_players <- merge(distinct_players,num_playergames, by="playername")
 
@@ -327,6 +319,4 @@ player_scatter <- ggplot(uchamps_players ,aes(x = num_games, y = unique_champs))
   xlab('Unique Champs') + 
   ylab('Role') +
   labs(title = "Unique champions over games played per player",
-       subtitle = "Does more games = more champs played") +
-  theme_fivethirtyeight() 
-
+       subtitle = "Does more games = more champs played") 
