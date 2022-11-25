@@ -170,7 +170,7 @@ top_10picked <- head(num_picked,10)
 top_10pickgraph <- ggplot(top_10picked, aes(x = reorder(champion, -n), y = n)) +
   geom_bar(stat="identity", color='black',fill='gray') + 
   xlab('Champion') + 
-  ylab('# Banned') +
+  ylab('# Picked') +
   labs(title = "Most Picked at Worlds 2022",
        subtitle = "How many times was each Champion picked at Worlds 2022")
                      
@@ -303,20 +303,46 @@ num_teamgames <- worlds %>%
   summarise(num_games=n_distinct(gameid)) %>%
   arrange(desc(num_games))
 
+# games + distinct champs teams
 uchamps_team <- merge(distinct_teams,num_teamgames,by="teamname")
-
 champion_scatter <- ggplot(uchamps_team ,aes(x = num_games, y = unique_champs)) +
   geom_point(size = 2, color='black',fill='gray') + 
-  xlab('Unique Champs') + 
-  ylab('Role') +
+  xlab('Games Played') + 
+  ylab('Unique Champs') +
   labs(title = "Unique champions over games played per team",
        subtitle = "Does more games = more champs played") 
 
+# games + distinct champs players
 uchamps_players <- merge(distinct_players,num_playergames, by="playername")
-
 player_scatter <- ggplot(uchamps_players ,aes(x = num_games, y = unique_champs)) +
   geom_point(size = 2, color='black',fill='gray') + 
-  xlab('Unique Champs') + 
-  ylab('Role') +
+  xlab('Games Played') + 
+  ylab('Unique Champs') +
   labs(title = "Unique champions over games played per player",
        subtitle = "Does more games = more champs played") 
+
+#Function that tells you what roles each champion was played in
+num_roles <- function(champ) {
+  
+  n <- worlds %>%
+    filter(champion == champ) %>%
+    select(position)
+  
+  return(unique(n$position))
+}
+
+# Seraphine, Maokai, Yone, Syndra, Sylas, Shen, Sett, Senna, Sejuani, Lillia, Ashe
+seraphine <- num_roles("Seraphine") 
+maokai <- num_roles("Maokai") 
+yone <- num_roles("Yone")
+syndra <- num_roles("Syndra")
+sylas <- num_roles("Sylas")
+shen <- num_roles("Shen")
+sett <- num_roles("Sett")
+senna <- num_roles("Senna") 
+sejuani <- num_roles("Sejuani")
+lillia <- num_roles("Lillia")
+ashe <- num_roles("Ashe")
+
+
+
