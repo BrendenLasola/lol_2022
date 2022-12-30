@@ -1,4 +1,4 @@
-# League of Legends Data Analysis: What effects Champion Diversity at the highest level? 
+# League of Legends Data Analysis: What affects Champion Diversity at the highest level? 
 
 ## Basic rundown of League of Legends E-Sports
 
